@@ -16,6 +16,13 @@ bonegular.factory('bonegular', function($http, $q) {
 
         var Model = function() {
 
+            Object.defineProperty(this, '_id_attribute', {
+                'configurable': false,
+                'writable': true,
+                'enumerable': false,
+                'value': options.id_attribute || '_id'
+            });
+
             Object.defineProperty(this, '_fetched', {
                 'configurable': false,
                 'writable': true,
@@ -90,6 +97,13 @@ bonegular.factory('bonegular', function($http, $q) {
     createCollection = function(options) {
 
         var Collection = function() {
+
+            Object.defineProperty(this, '_instance', {
+                'configurable': false,
+                'writable': true,
+                'enumerable': false,
+                'value': new options.model()
+            });
 
             Object.defineProperty(this, '_fetched', {
                 'configurable': false,

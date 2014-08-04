@@ -11,6 +11,7 @@ app.controller('DefaultController', function($scope, Countries) {
         var usa = countries.findWhere({
             'name': 'United States'
         });
+        console.log('usa', usa);
         var tn = usa.states.findWhere({
             'name': 'Tennessee'
         });
@@ -30,6 +31,7 @@ app.controller('DefaultController', function($scope, Countries) {
  */
 app.factory('Country', function(bonegular, States) {
     return bonegular.createModel({
+        'id_attribute': 'id',
         'collections': {
             'states': States
         },

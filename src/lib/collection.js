@@ -70,9 +70,9 @@ module.exports = function($http, $q) {
             if (!_.isFunction(model)) {
                 model = new this._Model(model);
             }
-            existing = this.findWhere({
-                '_id': model._id
-            });
+            var where = {};
+            where[model._id_attribute] = model.getId();
+            existing = this.findWhere(where);
             if (existing) {
                 this.replace(existing, model);
             } else {
@@ -97,9 +97,9 @@ module.exports = function($http, $q) {
         },
 
         'id': function(id) {
-            return _.findWhere(this.models, {
-                '_id': id
-            });
+            var where = {};
+            where[this._instance._id_attribute] = id;
+            return _.findWhere(this.models, where);
         },
 
         'filter': function(fn) {

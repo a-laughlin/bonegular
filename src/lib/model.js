@@ -87,18 +87,25 @@ module.exports = function($http, $q) {
             return JSON.stringify(this.toObject());
         },
 
+        /**
+         * Returns this model's unique ID.
+         */
+        'getId': function() {
+            return this[this._id_attribute];
+        },
+
         'url': function() {
             var result = '';
             if (this._collection) {
                 result = util.rtrim(this._collection.url(), '/');
-                result += ( '/' + ((this._id) ? this._id : '' ) );
+                result += ( '/' + ((this.getId()) ? this.getId() : '' ) );
             } else {
                 if (!this._rootUrl) {
                     throw 'Model does not belong to a collection, and no value has been specified for `rootUrl`.';
                 }
                 result = '/' + util.trim(this._rootUrl, '/');
-                if (this._id) {
-                    result = result + '/' + this._id;
+                if (this.getId()) {
+                    result = result + '/' + this.getId();
                 }
             }
             result = util.rtrim(result, '/');
@@ -155,7 +162,7 @@ module.exports = function($http, $q) {
         'save': function() {
             var d = $q.defer(),
                 self = this;
-            if (this._id) {
+            if (this.getId()) {
                 util.put(this.url(), this.toObject()).then(function(data) {
                     self.setData(data);
                     d.resolve(self);
