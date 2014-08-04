@@ -560,7 +560,6 @@ module.exports = function($http, $q) {
                         _.each(missing, function(collection) {
                             fetched.push(self[collection].get());
                         });
-                        console.log('fetched', fetched);
                         $q.when(fetched).then(function() {
                             d.resolve(self);
                         }, function(err) {
