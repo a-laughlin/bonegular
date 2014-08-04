@@ -20,6 +20,7 @@ By default, Bonegular models expect a unique identifier named `_id`. Models can 
 
 ```
 var Country = bonegular.createModel({
+	'id_attribute': 'id',
 	'methods': {}
 });
 ```
