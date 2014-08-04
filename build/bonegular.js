@@ -17,6 +17,13 @@ bonegular.factory('bonegular', function($http, $q) {
 
         var Model = function() {
 
+            Object.defineProperty(this, '_id_attribute', {
+                'configurable': false,
+                'writable': true,
+                'enumerable': false,
+                'value': options.id_attribute || '_id'
+            });
+
             Object.defineProperty(this, '_fetched', {
                 'configurable': false,
                 'writable': true,
@@ -91,6 +98,13 @@ bonegular.factory('bonegular', function($http, $q) {
     createCollection = function(options) {
 
         var Collection = function() {
+
+            Object.defineProperty(this, '_instance', {
+                'configurable': false,
+                'writable': true,
+                'enumerable': false,
+                'value': new options.model()
+            });
 
             Object.defineProperty(this, '_fetched', {
                 'configurable': false,
@@ -266,9 +280,9 @@ module.exports = function($http, $q) {
             if (!_.isFunction(model)) {
                 model = new this._Model(model);
             }
-            existing = this.findWhere({
-                '_id': model._id
-            });
+            var where = {};
+            where[model._id_attribute] = model.getId();
+            existing = this.findWhere(where);
             if (existing) {
                 this.replace(existing, model);
             } else {
@@ -293,9 +307,9 @@ module.exports = function($http, $q) {
         },
 
         'id': function(id) {
-            return _.findWhere(this.models, {
-                '_id': id
-            });
+            var where = {};
+            where[this._instance._id_attribute] = id;
+            return _.findWhere(this.models, where);
         },
 
         'filter': function(fn) {
@@ -490,18 +504,25 @@ module.exports = function($http, $q) {
             return JSON.stringify(this.toObject());
         },
 
+        /**
+         * Returns this model's unique ID.
+         */
+        'getId': function() {
+            return this[this._id_attribute];
+        },
+
         'url': function() {
             var result = '';
             if (this._collection) {
                 result = util.rtrim(this._collection.url(), '/');
-                result += ( '/' + ((this._id) ? this._id : '' ) );
+                result += ( '/' + ((this.getId()) ? this.getId() : '' ) );
             } else {
                 if (!this._rootUrl) {
                     throw 'Model does not belong to a collection, and no value has been specified for `rootUrl`.';
                 }
                 result = '/' + util.trim(this._rootUrl, '/');
-                if (this._id) {
-                    result = result + '/' + this._id;
+                if (this.getId()) {
+                    result = result + '/' + this.getId();
                 }
             }
             result = util.rtrim(result, '/');
@@ -558,7 +579,7 @@ module.exports = function($http, $q) {
         'save': function() {
             var d = $q.defer(),
                 self = this;
-            if (this._id) {
+            if (this.getId()) {
                 util.put(this.url(), this.toObject()).then(function(data) {
                     self.setData(data);
                     d.resolve(self);
