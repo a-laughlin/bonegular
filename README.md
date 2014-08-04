@@ -10,6 +10,8 @@ This is an alpha release. The API could change a little, but I'm already using t
 
 * [Introduction](#introduction)
 * [Examples](#examples)
+	* [Models](/docs/models.md)
+	* [Collections](/docs/collections.md)
 * [Installation](#installation)
 * [See a Live Example](#example)
 * [Dependencies](#dependencies)
