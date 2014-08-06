@@ -396,17 +396,16 @@ module.exports = function($http, $q) {
 
         'url': function() {
             var result = '';
-            if (this._rootUrl) {
+            if (this._parent) {
+                result = this._parent.url();
+                result = util.rtrim(result, '/');
+                result += '/' + util.trim(this._url, '/');
+            } else if (this._rootUrl) {
                 result = this._rootUrl;
+                result = util.rtrim(result, '/');
             } else {
-                if (this._parent) {
-                    result = this._parent.url();
-                } else {
-                    throw 'Model does not have a parent, and no value has been specified for `rootUrl`.';
-                }
+                throw 'Model does not have a parent, and no value has been specified for `rootUrl`.';
             }
-            result = util.rtrim(result, '/');
-            result += '/' + util.trim(this._url, '/');
             return result;
         }
 

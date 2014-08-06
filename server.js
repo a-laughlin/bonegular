@@ -24,4 +24,30 @@ app.put('/countries/:country_id/states/:state_id', function(req, res) {
     res.send(req.body);
 });
 
+app.get('/countries/:country_id/states/:state_id/people', function(req, res) {
+    res.send([
+        {
+            'id': 1,
+            'first_name': 'Tim'
+        },
+        {
+            'id': 2,
+            'first_name': 'Laura'
+        }
+    ]);
+});
+
+app.get('/people', function(req, res) {
+    res.send([
+        {
+            'id': 3,
+            'first_name': 'Wilhelm'
+        },
+        {
+            'id': 4,
+            'first_name': 'Albert'
+        }
+    ]);
+});
+
 module.exports = app;
