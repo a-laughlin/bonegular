@@ -98,7 +98,6 @@ bonegular.factory('bonegular', function($http, $q) {
                 if (virtual['set'] && _.isFunction(virtual['set'])) {
                     options['set'] = virtual['set']
                 }
-                console.log('virtual', name, options);
                 Object.defineProperty(this, name, options);
             }, this);
 
