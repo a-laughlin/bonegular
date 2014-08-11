@@ -24,10 +24,19 @@ app.controller('DefaultController', function($scope, Countries, People) {
 
         console.log('tn parent', tn.parent());
 
+        console.log('tn capitol', tn.capitol);
+        console.log('tn capitol population', tn.capitol.population);
+
         tn.save().then(function() {
             console.log('tn saved');
         }, function(err) {
             console.log(err);
+        });
+
+        tn.capitol.save().then(function() {
+            console.log('capitol saved');
+        }, function(err) {
+            console.log('capitol save error', err);
         });
 
         tn.people.get().then(function() {
@@ -71,17 +80,29 @@ app.factory('Countries', function(bonegular, Country) {
     });
 });
 
-app.factory('State', function(bonegular, People) {
+app.factory('State', function(bonegular, People, Capitol) {
+
     return bonegular.createModel({
         'methods': {
             'describe': function() {
                 alert(this.name + ' is awesome.');
             }
         },
+        'virtuals': {
+            'capitol': {
+                'get': function() {
+                    return this._capitol;
+                },
+                'set': function(capitol) {
+                    this._capitol = new Capitol(capitol, this);
+                }
+            },
+        },
         'collections': {
             'people': People
         }
     });
+
 });
 
 app.factory('States', function(bonegular, State) {
@@ -107,6 +128,16 @@ app.factory('Person', function(bonegular) {
     return bonegular.createModel({
         'id_attribute': 'id',
         'methods': {}
+    });
+
+});
+
+app.factory('Capitol', function(bonegular) {
+
+    return bonegular.createModel({
+        'id_attribute': 'id',
+        'methods': {},
+        'url': 'capitol'
     });
 
 });

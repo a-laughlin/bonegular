@@ -24,6 +24,10 @@ app.put('/countries/:country_id/states/:state_id', function(req, res) {
     res.send(req.body);
 });
 
+app.put('/countries/:country_id/states/:state_id/capitol', function(req, res) {
+    res.send(req.body);
+});
+
 app.get('/countries/:country_id/states/:state_id/people', function(req, res) {
     res.send([
         {

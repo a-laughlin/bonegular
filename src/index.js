@@ -14,6 +14,8 @@ bonegular.factory('bonegular', function($http, $q) {
      */
     createModel = function(options) {
 
+        options.virtuals = options.virtuals || {};
+
         var Model = function() {
 
             Object.defineProperty(this, '_id_attribute', {
@@ -58,12 +60,46 @@ bonegular.factory('bonegular', function($http, $q) {
                 'value': options.rootUrl || null
             });
 
+            Object.defineProperty(this, '_url', {
+                'configurable': false,
+                'writable': false,
+                'enumerable': false,
+                'value': options.url || null
+            });
+
             Object.defineProperty(this, '_collections', {
                 'configurable': false,
                 'writable': false,
                 'enumerable': false,
                 'value': options.collections || {}
             });
+
+            Object.defineProperty(this, '_virtuals', {
+                'configurable': false,
+                'writable': false,
+                'enumerable': false,
+                'value': options.virtuals || {}
+            });
+
+            _.each(options.virtuals, function(virtual, name) {
+                var options = {
+                    'configurable': false,
+                    'enumerable': true
+                };
+                if (_.isFunction(virtual)) {
+                    virtual = {
+                        'get': virtual
+                    };
+                }
+                if (virtual['get'] && _.isFunction(virtual['get'])) {
+                    options['get'] = virtual['get'];
+                }
+                if (virtual['set'] && _.isFunction(virtual['set'])) {
+                    options['set'] = virtual['set']
+                }
+                console.log('virtual', name, options);
+                Object.defineProperty(this, name, options);
+            }, this);
 
             this._init.apply(this, arguments);
 

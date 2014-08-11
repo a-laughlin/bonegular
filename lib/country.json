@@ -6,7 +6,12 @@
             "states": [
                 {
                     "_id": 1,
-                    "name": "Tennessee"
+                    "name": "Tennessee",
+                    "capitol": {
+                        "id": 2,
+                        "name": "Nashville",
+                        "population": 2000000
+                    }
                 }
             ]
         }
