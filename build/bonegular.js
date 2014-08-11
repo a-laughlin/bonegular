@@ -15,6 +15,8 @@ bonegular.factory('bonegular', function($http, $q) {
      */
     createModel = function(options) {
 
+        options.virtuals = options.virtuals || {};
+
         var Model = function() {
 
             Object.defineProperty(this, '_id_attribute', {
@@ -59,12 +61,46 @@ bonegular.factory('bonegular', function($http, $q) {
                 'value': options.rootUrl || null
             });
 
+            Object.defineProperty(this, '_url', {
+                'configurable': false,
+                'writable': false,
+                'enumerable': false,
+                'value': options.url || null
+            });
+
             Object.defineProperty(this, '_collections', {
                 'configurable': false,
                 'writable': false,
                 'enumerable': false,
                 'value': options.collections || {}
             });
+
+            Object.defineProperty(this, '_virtuals', {
+                'configurable': false,
+                'writable': false,
+                'enumerable': false,
+                'value': options.virtuals || {}
+            });
+
+            _.each(options.virtuals, function(virtual, name) {
+                var options = {
+                    'configurable': false,
+                    'enumerable': true
+                };
+                if (_.isFunction(virtual)) {
+                    virtual = {
+                        'get': virtual
+                    };
+                }
+                if (virtual['get'] && _.isFunction(virtual['get'])) {
+                    options['get'] = virtual['get'];
+                }
+                if (virtual['set'] && _.isFunction(virtual['set'])) {
+                    options['set'] = virtual['set']
+                }
+                console.log('virtual', name, options);
+                Object.defineProperty(this, name, options);
+            }, this);
 
             this._init.apply(this, arguments);
 
@@ -486,7 +522,8 @@ module.exports = function($http, $q) {
         },
 
         'toObject': function() {
-            var result = {};
+            var result = {},
+                virtualKeys = _.keys(this._virtuals);
             _.each(this, function(v, k) {
                 if (this.hasOwnProperty(k)) {
                     if (this._collections[k]) {
@@ -496,11 +533,20 @@ module.exports = function($http, $q) {
                     }
                 }
             }, this);
+            _.each(virtualKeys, function(vk) {
+                if (result[vk]) {
+                    delete result[vk];
+                }
+            });
             return result;
         },
 
+        /**
+         * When the `save` method of a Bonegular model is called, the data returned from this
+         * method is sent to the server. You can override this if you need to.
+         */
         'toJSON': function() {
-            return JSON.stringify(this.toObject());
+            return this.toObject();
         },
 
         /**
@@ -513,8 +559,16 @@ module.exports = function($http, $q) {
         'url': function() {
             var result = '';
             if (this._collection) {
+                // This model belongs to a collection.
                 result = util.rtrim(this._collection.url(), '/');
                 result += ( '/' + ((this.getId()) ? this.getId() : '' ) );
+            } else if (this._parent) {
+                // This model was directly assigned as a child of another model.
+                if (!this._url) {
+                    throw 'Models whose parent is another model must have a value for `_url`.';
+                }
+                result = util.rtrim(this._parent.url(), '/');
+                result += ( '/' + this._url);
             } else {
                 if (!this._rootUrl) {
                     throw 'Model does not belong to a collection, and no value has been specified for `rootUrl`.';
@@ -578,14 +632,14 @@ module.exports = function($http, $q) {
             var d = $q.defer(),
                 self = this;
             if (this.getId()) {
-                util.put(this.url(), this.toObject()).then(function(data) {
+                util.put(this.url(), this.toJSON()).then(function(data) {
                     self.setData(data);
                     d.resolve(self);
                 }, function(err) {
                     d.reject(err);
                 });
             } else {
-                util.post(this.url(), this.toObject()).then(function(data) {
+                util.post(this.url(), this.toJSON()).then(function(data) {
                     self.setData(data);
                     d.resolve(self);
                 }, function(err) {
