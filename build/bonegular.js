@@ -276,9 +276,7 @@ module.exports = function($http, $q) {
             }).then(function(rows) {
                 if (_.isArray(rows)) {
                     self._fetched = true;
-                    _.each(rows, function(row) {
-                        self.append(row);
-                    });
+                    self.replaceAll(rows);
                     d.resolve(self);
                 } else {
                     d.reject('Invalid data received: expected array');
