@@ -2,7 +2,7 @@
 
 var bonegular = angular.module('bonegular', []);
 
-bonegular.factory('bonegular', function($http, $q) {
+bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 
     var BaseModel, BaseCollection, createModel, createCollection;
 
@@ -246,4 +246,4 @@ bonegular.factory('bonegular', function($http, $q) {
 
     };
 
-});
+}]);
