@@ -267,8 +267,9 @@ module.exports = function($http, $q) {
                 this.setParent(parent);
             }
             _.each(rows, function(row) {
-                this.append(row);
+                this.append(row, false);
             }, this);
+            this._updateFilters();
         },
 
         'parent': function() {
@@ -314,9 +315,12 @@ module.exports = function($http, $q) {
             this._parent = parent;
         },
 
-        'append': function(model) {
+        'append': function(model, updateFilters) {
             var existing,
                 self = this;
+            if (!_.isBoolean(updateFilters)) {
+                updateFilters = true;
+            }
             if (!_.isFunction(model)) {
                 model = new this._Model(model);
             }
@@ -326,23 +330,38 @@ module.exports = function($http, $q) {
             if (existing) {
                 this.replace(existing, model);
             } else {
-                this.push(model);
+                this.push(model, updateFilters);
+            }
+            if (updateFilters) {
+                this._updateFilters();
             }
             return model;
         },
 
-        'push': function(model) {
+        'push': function(model, updateFilters) {
+            if (!_.isBoolean(updateFilters)) {
+                updateFilters = true;
+            }
             this.collectionize(model);
             this.models.push(model);
+            if (updateFilters) {
+                this._updateFilters();
+            }
         },
 
-        'remove': function(model) {
+        'remove': function(model, updateFilters) {
             var idx = this.models.indexOf(model);
             if (idx < 0) {
                 throw 'Specified model does not exist within this collection.';
             }
             this.models.splice(idx, 1);
             this.deCollectionize(model);
+            if (!_.isBoolean(updateFilters)) {
+                updateFilters = true;
+            }
+            if (updateFilters) {
+                this._updateFilters();
+            }
             return model;
         },
 
@@ -380,7 +399,7 @@ module.exports = function($http, $q) {
             return _.last(this.models);
         },
 
-        'replace': function(existing, replacement) {
+        'replace': function(existing, replacement, updateFilters) {
             var idx = this.models.indexOf(existing);
             if (idx < 0) {
                 throw 'Specified model does not exist within this collection.';
@@ -388,20 +407,38 @@ module.exports = function($http, $q) {
             this.collectionize(replacement);
             this.models.splice(idx, 1, replacement);
             this.deCollectionize(existing);
+            if (!_.isBoolean(updateFilters)) {
+                updateFilters = true;
+            }
+            if (updateFilters) {
+                this._updateFilters();
+            }
         },
 
-        'replaceAll': function(rows) {
+        'replaceAll': function(rows, updateFilters) {
             this.clear();
             _.each(rows, function(row) {
                 this.append(row);
             }, this);
+            if (!_.isBoolean(updateFilters)) {
+                updateFilters = true;
+            }
+            if (updateFilters) {
+                this._updateFilters();
+            }
         },
 
-        'clear': function() {
+        'clear': function(updateFilters) {
             _.each(this.models, function(model, k) {
                 this.deCollectionize(model);
                 this.models.splice(k, 1);
             }, this);
+            if (!_.isBoolean(updateFilters)) {
+                updateFilters = true;
+            }
+            if (updateFilters) {
+                this._updateFilters();
+            }
         },
 
         'collectionize': function(model) {
