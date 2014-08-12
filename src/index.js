@@ -147,6 +147,13 @@ bonegular.factory('bonegular', function($http, $q) {
                 'value': false
             });
 
+            Object.defineProperty(this, '_filters', {
+                'configurable': false,
+                'writable': true,
+                'enumerable': false,
+                'value': {}
+            });
+
             Object.defineProperty(this, '_cache', {
                 'configurable': false,
                 'writable': true,

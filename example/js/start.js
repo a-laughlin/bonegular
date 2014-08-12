@@ -15,6 +15,20 @@ app.controller('DefaultController', function($scope, Countries, People) {
         });
 
         console.log('usa', usa);
+        console.log('states', usa.states);
+
+        var westernStates = usa.states.createFilter('western', function(state) {
+            if (state.name !== 'Tennessee') {
+                return true;
+            }
+        });
+
+        var southernStates = usa.states.createFilter('southern', {
+            'name': 'Tennessee'
+        });
+
+        console.log('westernStates', westernStates);
+        console.log('southernStates', southernStates);
 
         var tn = usa.states.findWhere({
             'name': 'Tennessee'

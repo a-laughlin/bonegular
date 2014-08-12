@@ -148,6 +148,13 @@ bonegular.factory('bonegular', function($http, $q) {
                 'value': false
             });
 
+            Object.defineProperty(this, '_filters', {
+                'configurable': false,
+                'writable': true,
+                'enumerable': false,
+                'value': {}
+            });
+
             Object.defineProperty(this, '_cache', {
                 'configurable': false,
                 'writable': true,
@@ -413,6 +420,36 @@ module.exports = function($http, $q) {
                 result.push(model.toObject());
             });
             return result;
+        },
+
+        'createFilter': function(name, filter) {
+            if (this._filters[name]) {
+                throw 'Filter `' + name + '` already exists.';
+            }
+            this._filters[name] = {
+                'data': [],
+                'filter': filter
+            };
+            this._updateFilters();
+            return this._filters[name].data;
+        },
+
+        'getFilter': function(name) {
+            return this._filters[name].data;
+        },
+
+        '_updateFilters': function() {
+            _.each(this._filters, function(f, name) {
+                var results;
+                if (_.isFunction(f.filter)) {
+                    results = _.filter(this.models, f.filter, this);
+                } else {
+                    results = _.where(this.models, f.filter);
+                }
+                results.unshift(f.data.length);
+                results.unshift(0);
+                Array.prototype.splice.apply(f.data, results);
+            }, this);
         },
 
         'toJSON': function() {
