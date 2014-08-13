@@ -1,6 +1,6 @@
 {
   "name": "bonegular",
-  "version": "0.4",
+  "version": "0.4.1",
   "devDependencies": {
     "glob": "~4.0.3",
     "load-grunt-tasks": "~0.6.0",
