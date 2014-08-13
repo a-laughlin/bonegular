@@ -10,6 +10,9 @@ app.controller('DefaultController', function($scope, Countries, People) {
 
         console.log('Countries were fetched.', countries);
 
+        var clonedCountries = countries.clone();
+        console.log('clonedCountries', clonedCountries);
+
         var usa = countries.findWhere({
             'name': 'United States'
         });

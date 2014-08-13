@@ -4,10 +4,10 @@ var bonegular = angular.module('bonegular', []);
 
 bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 
-    var BaseModel, BaseCollection, createModel, createCollection;
+    var BaseModel, BaseCollection, createModel, createCollection, collections = {};
 
     BaseModel = require('./lib/model')($http, $q);
-    BaseCollection = require('./lib/collection')($http, $q);
+    BaseCollection = require('./lib/collection')($http, $q, collections);
 
     /**
      * Defines a new Model
@@ -207,6 +207,14 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 
         };
 
+        var collectionId = 'coll' + _.keys(collections).length;
+        Object.defineProperty(Collection.prototype, '_collection_id', {
+            'configurable': false,
+            'writable': true,
+            'enumerable': false,
+            'value': collectionId
+        });
+
         _.each(BaseCollection, function(method, name) {
             Object.defineProperty(Collection.prototype, name, {
                 'configurable': false,
@@ -229,6 +237,8 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
             var collection = new this;
             return collection.create.apply(collection, arguments);
         };
+
+        collections[collectionId] = Collection;
 
         return Collection;
 

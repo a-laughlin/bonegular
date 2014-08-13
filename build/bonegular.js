@@ -5,10 +5,10 @@ var bonegular = angular.module('bonegular', []);
 
 bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 
-    var BaseModel, BaseCollection, createModel, createCollection;
+    var BaseModel, BaseCollection, createModel, createCollection, collections = {};
 
     BaseModel = require('./lib/model')($http, $q);
-    BaseCollection = require('./lib/collection')($http, $q);
+    BaseCollection = require('./lib/collection')($http, $q, collections);
 
     /**
      * Defines a new Model
@@ -208,6 +208,14 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 
         };
 
+        var collectionId = 'coll' + _.keys(collections).length;
+        Object.defineProperty(Collection.prototype, '_collection_id', {
+            'configurable': false,
+            'writable': true,
+            'enumerable': false,
+            'value': collectionId
+        });
+
         _.each(BaseCollection, function(method, name) {
             Object.defineProperty(Collection.prototype, name, {
                 'configurable': false,
@@ -231,6 +239,8 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
             return collection.create.apply(collection, arguments);
         };
 
+        collections[collectionId] = Collection;
+
         return Collection;
 
     };
@@ -252,7 +262,7 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 },{"./lib/collection":2,"./lib/model":3}],2:[function(require,module,exports){
 'use strict';
 
-module.exports = function($http, $q) {
+module.exports = function($http, $q, collections) {
 
     var util = require('./util')($http, $q);
 
@@ -365,10 +375,28 @@ module.exports = function($http, $q) {
             return model;
         },
 
+        /**
+         * Returns a clone of this collection.
+         *
+         * @public
+         */
+        'clone': function() {
+            var collection = new collections[this._collection_id](this.toObject(), this._parent);
+            collection._fetched = this._fetched;
+            return collection;
+        },
+
+        /**
+         * Returns the model within the collection with the specified ID.
+         *
+         * @public
+         */
         'id': function(id) {
-            var where = {};
-            where[this._instance._id_attribute] = id;
-            return _.findWhere(this.models, where);
+            return _.find(this.models, function(model) {
+                if (model[this._instance._id_attribute] == id) {
+                    return true;
+                }
+            }, this);
         },
 
         'filter': function(fn) {

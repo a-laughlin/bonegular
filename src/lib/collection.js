@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function($http, $q) {
+module.exports = function($http, $q, collections) {
 
     var util = require('./util')($http, $q);
 
@@ -113,10 +113,28 @@ module.exports = function($http, $q) {
             return model;
         },
 
+        /**
+         * Returns a clone of this collection.
+         *
+         * @public
+         */
+        'clone': function() {
+            var collection = new collections[this._collection_id](this.toObject(), this._parent);
+            collection._fetched = this._fetched;
+            return collection;
+        },
+
+        /**
+         * Returns the model within the collection with the specified ID.
+         *
+         * @public
+         */
         'id': function(id) {
-            var where = {};
-            where[this._instance._id_attribute] = id;
-            return _.findWhere(this.models, where);
+            return _.find(this.models, function(model) {
+                if (model[this._instance._id_attribute] == id) {
+                    return true;
+                }
+            }, this);
         },
 
         'filter': function(fn) {
