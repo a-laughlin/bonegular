@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('./dash');
+
 module.exports = function($http, $q) {
 
     return {
@@ -96,6 +98,12 @@ module.exports = function($http, $q) {
 
         'reverseString': function(str) {
             return str.split('').reverse().join('');
+        },
+
+        'getDeep': function(obj, k) {
+        },
+
+        'setDeep': function(obj, k, v) {
         }
 
     };

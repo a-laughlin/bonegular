@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('./dash');
+
 module.exports = function($http, $q) {
 
     var util = require('./util')($http, $q);
@@ -69,6 +71,20 @@ module.exports = function($http, $q) {
             }, this);
         },
 
+        'get': function(k) {
+            if (k.indexOf('.') < 0) {
+                return this[k];
+            }
+            return _.deepGet(this, k);
+        },
+
+        'set': function(k, v) {
+            if (k.indexOf('.') < 0) {
+                return this[k] = v;
+            }
+            return _.deepSet(this, k, v);
+        },
+
         'toObject': function() {
             var result = {},
                 virtualKeys = _.keys(this._virtuals);
@@ -130,7 +146,7 @@ module.exports = function($http, $q) {
             return result;
         },
 
-        'get': function(options) {
+        'fetch': function(options) {
             options = options || {};
             _.defaults(options, {
                 'collections': []
@@ -159,7 +175,7 @@ module.exports = function($http, $q) {
                     } else {
                         var fetched = [];
                         _.each(missing, function(collection) {
-                            fetched.push(self[collection].get());
+                            fetched.push(self[collection].fetch());
                         });
                         $q.all(fetched).then(function() {
                             d.resolve(self);

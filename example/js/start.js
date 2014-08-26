@@ -6,7 +6,7 @@ app.controller('DefaultController', function($scope, Countries, People) {
 
     var countries = new Countries();
     $scope.countries = countries.models;
-    countries.get().then(function() {
+    countries.fetch().then(function() {
 
         console.log('Countries were fetched.', countries);
 
@@ -56,8 +56,14 @@ app.controller('DefaultController', function($scope, Countries, People) {
             console.log('capitol save error', err);
         });
 
-        tn.people.get().then(function() {
+        tn.people.fetch().then(function() {
+
             console.log('tn.people', tn.people);
+
+            var tim = tn.people.id(1);
+            console.log('tim', tim);
+            console.log('candy', tim.get('favorite_foods.candy'));
+
         }, function(err) {
             console.log(err);
         });
@@ -65,7 +71,7 @@ app.controller('DefaultController', function($scope, Countries, People) {
     });
 
     var people = new People();
-    people.get().then(function() {
+    people.fetch().then(function() {
         console.log('people', people);
     }, function(err) {
         console.log(err);

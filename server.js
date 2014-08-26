@@ -32,7 +32,15 @@ app.get('/countries/:country_id/states/:state_id/people', function(req, res) {
     res.send([
         {
             'id': 1,
-            'first_name': 'Tim'
+            'first_name': 'Tim',
+            'favorite_foods': {
+                'candy': [
+                    'twizzlers', 'snickers'
+                ],
+                'vegetables': [
+                    'spinach', 'carrots'
+                ]
+            }
         },
         {
             'id': 2,

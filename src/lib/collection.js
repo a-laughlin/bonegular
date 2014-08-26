@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('./dash');
+
 module.exports = function($http, $q, collections) {
 
     var util = require('./util')($http, $q);
@@ -24,7 +26,7 @@ module.exports = function($http, $q, collections) {
             return this._parent;
         },
 
-        'get': function() {
+        'fetch': function() {
             var d = $q.defer(),
                 self = this;
             util.get(this.url(), {

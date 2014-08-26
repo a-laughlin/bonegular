@@ -14,7 +14,6 @@ This is an alpha release. The API could change a little, but I'm already using t
 	* [Collections](/docs/collections.md)
 * [Installation](#installation)
 * [See a Live Example](#example)
-* [Dependencies](#dependencies)
 * [License](#license)
 
 # Examples <a name="examples"></a>
@@ -162,10 +161,6 @@ $ bower install bonegular --save
 * Clone this project.
 * Install dependencies: ```$ npm install; bower install```
 * Launch the example: ```$ grunt serve```
-
-# Dependencies <a name="dependencies"></a>
-
-* [Underscore](http://http://underscorejs.org/) or [LoDash](http://lodash.com/)
 
 # License (MIT) <a name="license"></a>
 

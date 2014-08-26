@@ -27,5 +27,15 @@
     "clean-css": "~2.2.7",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-browserify": "~2.1.3"
+  },
+  "browserify": {
+    "transform": [
+      "aliasify"
+    ]
+  },
+  "aliasify": {
+    "aliases": {
+      "lodash": "./src/lib/lodash"
+    }
   }
 }
