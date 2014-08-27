@@ -1,7 +1,7 @@
 'use strict';
+/* global _ */
 
 var bonegular = angular.module('bonegular', []);
-var _ = require('./lib/dash');
 
 bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 

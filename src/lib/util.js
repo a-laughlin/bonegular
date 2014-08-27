@@ -1,6 +1,5 @@
 'use strict';
-
-var _ = require('./dash');
+/* global _ */
 
 module.exports = function($http, $q) {
 

@@ -12,6 +12,7 @@ This is an alpha release. The API could change a little, but I'm already using t
 * [Examples](#examples)
 	* [Models](/docs/models.md)
 	* [Collections](/docs/collections.md)
+* [Dependencies](#deps)
 * [Installation](#installation)
 * [See a Live Example](#example)
 * [License](#license)
@@ -149,6 +150,10 @@ app.factory('schools', function(Schools) {
 	return schools.get();
 });
 ```
+## Dependencies <a name="deps"></a>
+
+* [Lo-Dash](http://lodash.com)
+* [Lo-Dash-Deep](https://github.com/marklagendijk/lodash-deep)
 
 ## Installation <a name="installation"></a>
 
