@@ -2,7 +2,22 @@ app = angular.module('myApp', [
     'bonegular'
 ]);
 
-app.controller('DefaultController', function($scope, Countries, People) {
+app.controller('DefaultController', function($scope, Countries, EuropeanCountries, People) {
+
+    var europeanCountries = new EuropeanCountries();
+    europeanCountries.fetch().then(function() {
+        europeanCountries.something();
+    }, function(err) {
+        console.log(err);
+    });
+
+    var people = new People();
+
+    people.fetch().then(function() {
+        console.log('people', people);
+    }, function(err) {
+        console.log(err);
+    });
 
     var countries = new Countries();
     $scope.countries = countries.models;
@@ -70,13 +85,6 @@ app.controller('DefaultController', function($scope, Countries, People) {
 
     });
 
-    var people = new People();
-    people.fetch().then(function() {
-        console.log('people', people);
-    }, function(err) {
-        console.log(err);
-    });
-
 });
 
 /**
@@ -99,7 +107,17 @@ app.factory('Countries', function(bonegular, Country) {
     return bonegular.createCollection({
         'model': Country,
         'rootUrl': '/countries',
-        'methods': {}
+        'methods': {
+            'something': function() {
+                console.log('something', this);
+            }
+        }
+    });
+});
+
+app.factory('EuropeanCountries', function(Countries) {
+    return Countries.extend({
+        'rootUrl': '/european-countries'
     });
 });
 
@@ -129,11 +147,13 @@ app.factory('State', function(bonegular, People, Capitol) {
 });
 
 app.factory('States', function(bonegular, State) {
+
     return bonegular.createCollection({
         'model': State,
         'url': 'states',
         'methods': {}
     });
+
 });
 
 app.factory('People', function(bonegular, Person) {
@@ -150,7 +170,8 @@ app.factory('Person', function(bonegular) {
 
     return bonegular.createModel({
         'id_attribute': 'id',
-        'methods': {}
+        'methods': {
+        }
     });
 
 });
@@ -160,7 +181,7 @@ app.factory('Capitol', function(bonegular) {
     return bonegular.createModel({
         'id_attribute': 'id',
         'methods': {},
-        'url': 'capitol'
+        'rootUrl': '/capitols'
     });
 
 });

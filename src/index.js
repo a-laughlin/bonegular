@@ -5,7 +5,7 @@ var _ = require('./lib/dash');
 
 bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
 
-    var BaseModel, BaseCollection, createModel, createCollection, collections = {};
+    var BaseCollection, BaseModel, createModel, createCollection, collections = {};
 
     BaseModel = require('./lib/model')($http, $q);
     BaseCollection = require('./lib/collection')($http, $q, collections);
@@ -133,111 +133,66 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
     createCollection = function(options) {
 
         var Collection = function() {
-
-            Object.defineProperty(this, '_instance', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': false,
-                'value': new options.model()
-            });
-
-            Object.defineProperty(this, '_fetched', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': false,
-                'value': false
-            });
-
-            Object.defineProperty(this, '_filters', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': false,
-                'value': {}
-            });
-
-            Object.defineProperty(this, '_cache', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': false,
-                'value': options.cache || null
-            });
-
-            Object.defineProperty(this, 'models', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': true,
-                'value': []
-            });
-
-            Object.defineProperty(this, '_model', {
-                'configurable': false,
-                'writable': false,
-                'enumerable': false,
-                'value': options.model
-            });
-
-            Object.defineProperty(this, '_Model', {
-                'configurable': false,
-                'writable': false,
-                'enumerable': false,
-                'value': options.model
-            });
-
-            Object.defineProperty(this, '_url', {
-                'configurable': false,
-                'writable': false,
-                'enumerable': false,
-                'value': options.url
-            });
-
-            Object.defineProperty(this, '_rootUrl', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': false,
-                'value': options.rootUrl || null
-            });
-
-            Object.defineProperty(this, '_parent', {
-                'configurable': false,
-                'writable': true,
-                'enumerable': false,
-                'value': null
-            });
-
-            this._init.apply(this, arguments);
-
+            BaseCollection.apply(this, arguments);
         };
 
-        var collectionId = 'coll' + _.keys(collections).length;
-        Object.defineProperty(Collection.prototype, '_collection_id', {
-            'configurable': false,
-            'writable': true,
-            'enumerable': false,
-            'value': collectionId
-        });
+        Collection.prototype = new BaseCollection();
+        Collection.prototype.constructor = Collection;
 
-        _.each(BaseCollection, function(method, name) {
-            Object.defineProperty(Collection.prototype, name, {
-                'configurable': false,
-                'writable': false,
-                'enumerable': false,
-                'value': method
-            });
-        });
+        var extendProto = function(proto, options) {
+            if (options.url) {
+                _.extend(proto, {
+                    '_url': options.url
+                });
+            }
 
-        _.each(options.methods, function(method, name) {
-            Object.defineProperty(Collection.prototype, name, {
-                'configurable': false,
-                'writable': false,
-                'enumerable': false,
-                'value': method
-            });
-        });
+            if (options.rootUrl) {
+                _.extend(proto, {
+                    '_rootUrl': options.rootUrl
+                });
+            }
+
+            if (options.cache) {
+                _.extend(proto, {
+                    '_cache': options.cache
+                });
+            }
+
+            if (options.model) {
+                _.extend(proto, {
+                    '_model': options.model,
+                    '_Model': options.model,
+                    '_instance': new options.model()
+                });
+            }
+
+            if (options.methods) {
+                _.extend(proto, options.methods);
+            }
+        };
+
+        extendProto(Collection.prototype, options);
 
         Collection.create = function() {
             var collection = new this;
             return collection.create.apply(collection, arguments);
         };
+
+        Collection.extend = function(options) {
+            var self = this;
+            var ExtendedCollection = function() {
+                self.apply(this, arguments);
+            };
+            ExtendedCollection.prototype = new self;
+            ExtendedCollection.prototype.constructor = ExtendedCollection;
+            extendProto(ExtendedCollection.prototype, options);
+            return ExtendedCollection;
+        };
+
+        var collectionId = 'coll' + _.keys(collections).length;
+        _.extend(Collection.prototype, {
+            '_collection_id': collectionId
+        });
 
         collections[collectionId] = Collection;
 

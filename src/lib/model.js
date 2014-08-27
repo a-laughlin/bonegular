@@ -128,14 +128,13 @@ module.exports = function($http, $q) {
                 result += ( '/' + ((this.getId()) ? this.getId() : '' ) );
             } else if (this._parent) {
                 // This model was directly assigned as a child of another model.
-                if (!this._url) {
-                    throw 'Models whose parent is another model must have a value for `_url`.';
+                if (!this._rootUrl) {
+                    throw 'Models whose parent is another model must have a value for `rootUrl`.';
                 }
-                result = util.rtrim(this._parent.url(), '/');
-                result += ( '/' + this._url);
+                result = this._rootUrl + '/' + this.getId();
             } else {
                 if (!this._rootUrl) {
-                    throw 'Model does not belong to a collection, and no value has been specified for `rootUrl`.';
+                    throw 'Model has no parent, and no value has been specified for `rootUrl`.';
                 }
                 result = '/' + util.trim(this._rootUrl, '/');
                 if (this.getId()) {

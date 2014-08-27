@@ -1,7 +1,8 @@
 var express = require('express'),
     app = express(),
     fs = require('fs'),
-    browserify = require('browserify');
+    browserify = require('browserify'),
+    _ = require('underscore');
 
 app.use('/build', express.static(__dirname + '/build'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
@@ -20,11 +21,21 @@ app.get('/countries', function(req, res) {
     res.send(require('./lib/country.json').data);
 });
 
+app.get('/european-countries', function(req, res) {
+    var data = require('./lib/country.json').data;
+    var result = _.filter(data, function(c) {
+        if (c.id === 2) {
+            return true;
+        }
+    });
+    res.send(result);
+});
+
 app.put('/countries/:country_id/states/:state_id', function(req, res) {
     res.send(req.body);
 });
 
-app.put('/countries/:country_id/states/:state_id/capitol', function(req, res) {
+app.put('/capitols/:capitol_id', function(req, res) {
     res.send(req.body);
 });
 

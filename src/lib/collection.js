@@ -6,7 +6,41 @@ module.exports = function($http, $q, collections) {
 
     var util = require('./util')($http, $q);
 
-    return {
+    function BaseCollection() {
+
+        Object.defineProperty(this, '_fetched', {
+            'configurable': false,
+            'writable': true,
+            'enumerable': false,
+            'value': false
+        });
+
+        Object.defineProperty(this, '_filters', {
+            'configurable': false,
+            'writable': true,
+            'enumerable': false,
+            'value': {}
+        });
+
+        Object.defineProperty(this, 'models', {
+            'configurable': false,
+            'writable': true,
+            'enumerable': true,
+            'value': []
+        });
+
+        Object.defineProperty(this, '_parent', {
+            'configurable': false,
+            'writable': true,
+            'enumerable': false,
+            'value': null
+        });
+
+        this._init.apply(this, arguments);
+
+    };
+
+    _.extend(BaseCollection.prototype, {
 
         '_init': function(rows, parent) {
             if (_.isArray(rows)) {
@@ -279,11 +313,16 @@ module.exports = function($http, $q, collections) {
                 result = this._rootUrl;
                 result = util.rtrim(result, '/');
             } else {
-                throw 'Model does not have a parent, and no value has been specified for `rootUrl`.';
+                console.log('this', this);
+                console.log('u', this._rootUrl);
+                console.log('m', this._model);
+                throw 'Collection does not have a parent, and no value has been specified for `rootUrl`.';
             }
             return result;
         }
 
-    };
+    });
+
+    return BaseCollection;
 
 };
