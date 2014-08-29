@@ -140,6 +140,18 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
         Collection.prototype.constructor = Collection;
 
         var extendProto = function(proto, options) {
+
+            options.filters = options.filters || {}
+            options.virtuals = options.virtuals || {};
+
+            _.extend(proto, {
+                '_protofilters': options.filters
+            });
+
+            _.extend(proto, {
+                '_protoVirtuals': options.virtuals
+            });
+
             if (options.url) {
                 _.extend(proto, {
                     '_url': options.url
@@ -169,6 +181,7 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
             if (options.methods) {
                 _.extend(proto, options.methods);
             }
+
         };
 
         extendProto(Collection.prototype, options);

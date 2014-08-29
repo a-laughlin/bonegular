@@ -141,6 +141,18 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
         Collection.prototype.constructor = Collection;
 
         var extendProto = function(proto, options) {
+
+            options.filters = options.filters || {}
+            options.virtuals = options.virtuals || {};
+
+            _.extend(proto, {
+                '_protofilters': options.filters
+            });
+
+            _.extend(proto, {
+                '_protoVirtuals': options.virtuals
+            });
+
             if (options.url) {
                 _.extend(proto, {
                     '_url': options.url
@@ -170,6 +182,7 @@ bonegular.factory('bonegular', ['$http', '$q', function($http, $q) {
             if (options.methods) {
                 _.extend(proto, options.methods);
             }
+
         };
 
         extendProto(Collection.prototype, options);
@@ -232,12 +245,14 @@ module.exports = function($http, $q, collections) {
             'value': false
         });
 
+        /*
         Object.defineProperty(this, '_filters', {
             'configurable': false,
             'writable': true,
             'enumerable': false,
             'value': {}
         });
+        */
 
         Object.defineProperty(this, 'models', {
             'configurable': false,
@@ -260,6 +275,8 @@ module.exports = function($http, $q, collections) {
     _.extend(BaseCollection.prototype, {
 
         '_init': function(rows, parent) {
+            this._initFilters();
+            this._initVirtuals();
             if (_.isArray(rows)) {
                 this._fetched = true;
             }
@@ -478,6 +495,19 @@ module.exports = function($http, $q, collections) {
             return result;
         },
 
+        '_initVirtuals': function() {
+            _.each(this._protoVirtuals, function(virtual, name) {
+                this.createVirtual(name, virtual);
+            }, this);
+        },
+
+        '_initFilters': function() {
+            this._filters = {};
+            _.each(this._protofilters, function(filter, name) {
+                this.createFilter(name, filter);
+            }, this);
+        },
+
         'createFilter': function(name, filter) {
             if (this._filters[name]) {
                 throw 'Filter `' + name + '` already exists.';
@@ -486,8 +516,30 @@ module.exports = function($http, $q, collections) {
                 'data': [],
                 'filter': filter
             };
+            this.createVirtual(name, function() {
+                return this._filters[name].data;
+            });
             this._updateFilters();
             return this._filters[name].data;
+        },
+
+        'createVirtual': function(name, virtual) {
+            var options = {
+                'configurable': false,
+                'enumerable': true
+            };
+            if (_.isFunction(virtual)) {
+                virtual = {
+                    'get': virtual
+                };
+            }
+            if (virtual['get'] && _.isFunction(virtual['get'])) {
+                options['get'] = virtual['get'];
+            }
+            if (virtual['set'] && _.isFunction(virtual['set'])) {
+                options['set'] = virtual['set']
+            }
+            Object.defineProperty(this, name, options);
         },
 
         'getFilter': function(name) {
@@ -530,9 +582,6 @@ module.exports = function($http, $q, collections) {
                 result = this._rootUrl;
                 result = util.rtrim(result, '/');
             } else {
-                console.log('this', this);
-                console.log('u', this._rootUrl);
-                console.log('m', this._model);
                 throw 'Collection does not have a parent, and no value has been specified for `rootUrl`.';
             }
             return result;
@@ -543,6 +592,7 @@ module.exports = function($http, $q, collections) {
     return BaseCollection;
 
 };
+
 
 },{"./util":4}],3:[function(require,module,exports){
 'use strict';
