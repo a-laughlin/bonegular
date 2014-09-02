@@ -465,10 +465,13 @@ module.exports = function($http, $q, collections) {
         },
 
         'clear': function(updateFilters) {
+            for (var i = 0; i < this.models.length; i++) {
+                var model = this.models[i];
+            }
             _.each(this.models, function(model, k) {
                 this.deCollectionize(model);
-                this.models.splice(k, 1);
             }, this);
+            this.models.splice(0, this.models.length);
             if (!_.isBoolean(updateFilters)) {
                 updateFilters = true;
             }
