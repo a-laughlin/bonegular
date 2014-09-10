@@ -302,7 +302,7 @@ module.exports = function($http, $q, collections) {
             }).then(function(rows) {
                 if (_.isArray(rows)) {
                     self._fetched = true;
-                    self.replaceAll(rows);
+                    self.set(rows);
                     d.resolve(self);
                 } else {
                     d.reject('Invalid data received: expected array');
@@ -449,6 +449,37 @@ module.exports = function($http, $q, collections) {
             if (updateFilters) {
                 this._updateFilters();
             }
+        },
+
+        'set': function(rows) {
+            var model = new this._model();
+            var idAttr = model._id_attribute;
+            _.each(rows, function(row) {
+                var existing = this.id(row[idAttr]);
+                if (existing) {
+                    existing.set(row);
+                } else {
+                    this.append(row, false);
+                }
+            }, this);
+            _.each(this.models, function(model) {
+                var filter = {};
+                filter[idAttr] = model.getId();
+                var newRecord = _.findWhere(rows, filter);
+                if (!newRecord) {
+                    this.remove(model, false);
+                }
+            }, this);
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var model = this.id(row[idAttr]);
+                var idx = this.models.indexOf(model);
+                if (idx !== i) {
+                    this.models.splice(idx, 1);
+                    this.models.splice(i, 0, model);
+                }
+            }
+            this._updateFilters();
         },
 
         'replaceAll': function(rows, updateFilters) {
@@ -678,10 +709,16 @@ module.exports = function($http, $q) {
         },
 
         'set': function(k, v) {
-            if (k.indexOf('.') < 0) {
-                return this[k] = v;
+            if (_.isObject(k)) {
+                _.each(k, function(v, k) {
+                    this.set(k, v);
+                }, this);
+            } else {
+                if (k.indexOf('.') < 0) {
+                    return this[k] = v;
+                }
+                return _.deepSet(this, k, v);
             }
-            return _.deepSet(this, k, v);
         },
 
         'toObject': function() {

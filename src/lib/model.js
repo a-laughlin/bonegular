@@ -78,10 +78,16 @@ module.exports = function($http, $q) {
         },
 
         'set': function(k, v) {
-            if (k.indexOf('.') < 0) {
-                return this[k] = v;
+            if (_.isObject(k)) {
+                _.each(k, function(v, k) {
+                    this.set(k, v);
+                }, this);
+            } else {
+                if (k.indexOf('.') < 0) {
+                    return this[k] = v;
+                }
+                return _.deepSet(this, k, v);
             }
-            return _.deepSet(this, k, v);
         },
 
         'toObject': function() {
