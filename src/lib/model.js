@@ -70,11 +70,15 @@ module.exports = function($http, $q) {
             }, this);
         },
 
-        'get': function(k) {
+        'get': function(k, defaultValue) {
             if (k.indexOf('.') < 0) {
                 return this[k];
             }
-            return _.deepGet(this, k);
+            var value = _.deepGet(this, k);
+            if (!value && !_.isUndefined(defaultValue)) {
+                value = defaultValue;
+            }
+            return value;
         },
 
         'set': function(k, v) {
