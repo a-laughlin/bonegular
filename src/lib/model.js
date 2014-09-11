@@ -88,7 +88,11 @@ module.exports = function($http, $q) {
                 }, this);
             } else {
                 if (k.indexOf('.') < 0) {
-                    return this[k] = v;
+                    if (this._collections[k]) {
+                        return this[k].set(v);
+                    } else {
+                        return this[k] = v;
+                    }
                 }
                 return _.deepSet(this, k, v);
             }
