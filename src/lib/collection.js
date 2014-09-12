@@ -44,8 +44,20 @@ module.exports = function($http, $q, collections) {
     _.extend(BaseCollection.prototype, {
 
         '_init': function(rows, parent) {
+
+            var self = this;
+
             this._initFilters();
             this._initVirtuals();
+
+            Object.defineProperty(this, 'length', {
+                'configurable': false,
+                'enumerable': true,
+                'get': function() {
+                    return self.models.length;
+                }
+            });
+
             if (_.isArray(rows)) {
                 this._fetched = true;
             }

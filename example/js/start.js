@@ -15,6 +15,7 @@ app.controller('DefaultController', function($scope, Countries, EuropeanCountrie
 
     people.fetch().then(function() {
         console.log('people', people);
+        console.log('people.length', people.length);
     }, function(err) {
         console.log(err);
     });

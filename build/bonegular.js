@@ -275,8 +275,20 @@ module.exports = function($http, $q, collections) {
     _.extend(BaseCollection.prototype, {
 
         '_init': function(rows, parent) {
+
+            var self = this;
+
             this._initFilters();
             this._initVirtuals();
+
+            Object.defineProperty(this, 'length', {
+                'configurable': false,
+                'enumerable': true,
+                'get': function() {
+                    return self.models.length;
+                }
+            });
+
             if (_.isArray(rows)) {
                 this._fetched = true;
             }
@@ -701,11 +713,15 @@ module.exports = function($http, $q) {
             }, this);
         },
 
-        'get': function(k) {
+        'get': function(k, defaultValue) {
             if (k.indexOf('.') < 0) {
                 return this[k];
             }
-            return _.deepGet(this, k);
+            var value = _.deepGet(this, k);
+            if (!value && !_.isUndefined(defaultValue)) {
+                value = defaultValue;
+            }
+            return value;
         },
 
         'set': function(k, v) {
@@ -715,7 +731,11 @@ module.exports = function($http, $q) {
                 }, this);
             } else {
                 if (k.indexOf('.') < 0) {
-                    return this[k] = v;
+                    if (this._collections[k]) {
+                        return this[k].set(v);
+                    } else {
+                        return this[k] = v;
+                    }
                 }
                 return _.deepSet(this, k, v);
             }
@@ -733,11 +753,13 @@ module.exports = function($http, $q) {
                     }
                 }
             }, this);
+            /*
             _.each(virtualKeys, function(vk) {
                 if (result[vk]) {
                     delete result[vk];
                 }
             });
+            */
             return result;
         },
 
