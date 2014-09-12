@@ -1,6 +1,6 @@
 {
   "name": "bonegular",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "dependencies": {
     "angular": "~1.2.20",
     "underscore": "~1.6.0",
