@@ -110,11 +110,13 @@ module.exports = function($http, $q) {
                     }
                 }
             }, this);
+            /*
             _.each(virtualKeys, function(vk) {
                 if (result[vk]) {
                     delete result[vk];
                 }
             });
+            */
             return result;
         },
 
