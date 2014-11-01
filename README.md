@@ -1,5 +1,7 @@
 # Bonegular <a name="introduction"></a>
 
+**This project is no longer maintained.** - If you'd like to take ownership of this project, let me know - I'll transfer it to you.
+
 ### Backbone-Inspired Models and Collections for Angular
 
 <img style="float: right; width: 125px; margin-left: 20px;" src="https://dl.dropboxusercontent.com/u/832215/bonegular.png" />

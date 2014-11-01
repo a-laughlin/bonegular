@@ -5,6 +5,7 @@ var express = require('express'),
     _ = require('underscore');
 
 app.use('/build', express.static(__dirname + '/build'));
+app.use('/docs', express.static(__dirname + '/docs'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use('/', express.static(__dirname + '/example'));
 
